@@ -1,0 +1,5 @@
+{
+  "awsKey": "this/",
+  "awsSecret": "this",
+  "hostedZoneId": "The hosted zone id"
+}

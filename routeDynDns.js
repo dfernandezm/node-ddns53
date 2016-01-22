@@ -45,6 +45,7 @@ function RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId) {
   });
 
   this.route53.setRecord = Promise.promisify(this.route53.setRecord, {context: this.route53});
+  this.route53.records = Promise.promisify(this.route53.records, {context: this.route53});
 
   this.domains = domainsToChange || [];
   this.hostedZoneId = hostedZoneId;
@@ -60,6 +61,15 @@ RouteDynDns.prototype.updateRecords = function() {
    }).catch(function(error) {
       console.log("Error fetching IP from icanhazip ", error);
    });
+}
+
+RouteDynDns.prototype.listRecords = function() {
+  console.log("Listing records for hosted Zone ID ", this.hostedZoneId);
+  this.route53.records(this.hostedZoneId).then(function(records) {
+    console.log("Records in hosted zone are:\n",records);
+  }).catch(function(err) {
+    console.log("Error getting records", err);
+  });
 }
 
 module.exports = RouteDynDns;

@@ -6,7 +6,7 @@ var awsAccessKey = config.awsKey;
 var awsSecret = config.awsSecret;
 var hostedZoneId = config.hostedZoneId;
 
-var domainsToChange = ['videos.morenware.com.'];
+var domainsToChange = ['torrents.morenware.com.'];
 var dynDns = new RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId);
 
 var j = schedule.scheduleJob('* */6 * * *', function(){
