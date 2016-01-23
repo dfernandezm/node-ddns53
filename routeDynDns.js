@@ -66,7 +66,9 @@ RouteDynDns.prototype.updateRecords = function() {
 RouteDynDns.prototype.listRecords = function() {
   console.log("Listing records for hosted Zone ID ", this.hostedZoneId);
   this.route53.records(this.hostedZoneId).then(function(records) {
-    console.log("Records in hosted zone are:\n",records);
+     _.each(records, function (rec, index) {
+        console.log("Record name: " + rec.name + ", value: " + rec.values[0]);
+     });
   }).catch(function(err) {
     console.log("Error getting records", err);
   });
