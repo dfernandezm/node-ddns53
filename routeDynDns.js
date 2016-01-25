@@ -15,9 +15,10 @@ function getPublicIp() {
     return request('http://icanhazip.com');
 }
 
-function updateIpForHostnames(newIp, hostedZoneId, domains, route53) {
-   // Use async?
+function updateIpForHostnames(newIp, hostedZoneId, domains, route53, log) {
+    // Use async?
     _.each(domains, function (domain, index) {
+
       var args = {
         zoneId: hostedZoneId,
         name: domain,
@@ -27,17 +28,18 @@ function updateIpForHostnames(newIp, hostedZoneId, domains, route53) {
             newIp,
         ]
       };
+
       route53.setRecord(args).then(function(res) {
-        console.log("Successfully set record", res);
+        log.info("Successfully set record", res);
       }).catch(function(err) {
-        console.log("Error setting record", err);
+        log.error("Error setting record", err);
       });
 
     });
 }
 
 // Constructor
-function RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId) {
+function RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId, log) {
 
   this.route53 = new Route53({
       accessKeyId: awsAccessKey,
@@ -49,28 +51,30 @@ function RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId) {
 
   this.domains = domainsToChange || [];
   this.hostedZoneId = hostedZoneId;
+  this.log = log;
 }
 
 // Public part
 RouteDynDns.prototype.updateRecords = function() {
-  console.log("About to check changes in public IP for hosted Zone ID ", this.hostedZoneId);
+   this.log.info("About to check changes in public IP for hosted Zone ID ", this.hostedZoneId);
    var self = this;
    getPublicIp().then(function(ipString) {
-     console.log("The public IP is ", ipString);
-     updateIpForHostnames(ipString, self.hostedZoneId, self.domains, self.route53);
+     self.log.info("The public IP is ", ipString);
+     updateIpForHostnames(ipString, self.hostedZoneId, self.domains, self.route53, self.log);
    }).catch(function(error) {
-      console.log("Error fetching IP from icanhazip ", error);
+      self.log.error("Error fetching IP from icanhazip ", error);
    });
 }
 
 RouteDynDns.prototype.listRecords = function() {
-  console.log("Listing records for hosted Zone ID ", this.hostedZoneId);
+  this.log.info("Listing records for hosted Zone ID ", this.hostedZoneId);
+  var self = this;
   this.route53.records(this.hostedZoneId).then(function(records) {
      _.each(records, function (rec, index) {
-        console.log("Record name: " + rec.name + ", value: " + rec.values[0]);
+        self.log.info("Record name: " + rec.name + ", value: " + rec.values[0]);
      });
   }).catch(function(err) {
-    console.log("Error getting records", err);
+    self.log.info("Error getting records", err);
   });
 }
 

@@ -14,6 +14,7 @@
     "nice-route53": "^1.0.2",
     "node-schedule": "^0.6.0",
     "request-promise": "^1.0.2",
-    "shelljs": "^0.5.3"
+    "shelljs": "^0.5.3",
+    "simple-node-logger": "^0.92.21"
   }
 }
