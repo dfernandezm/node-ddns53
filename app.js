@@ -9,19 +9,21 @@ opts = {
 log = SimpleNodeLogger.createSimpleLogger(opts);
 
 var awsAccessKey = config.awsKey;
-
 var awsSecret = config.awsSecret;
 var hostedZoneId = config.hostedZoneId;
 
 var domainsToChange = ['cosas.morenware.com.', 'cosas-stage.morenware.com', 'xbmc.morenware.com'];
 var dynDns = new RouteDynDns(awsAccessKey, awsSecret, domainsToChange, hostedZoneId, log);
 
-var j = schedule.scheduleJob('* * * * *', function(){
+var delay = 30 * 60 * 1000;
+
+log.info("Starting...");
+dynDns.listRecords();
+dynDns.updateRecords();
+
+// Use setInterval so the process does not exit
+setInterval(function() {
   log.info('Running check...');
   dynDns.listRecords();
   dynDns.updateRecords();
-});
-
-if (typeof j !== undefined) {
-  log.info("Scheduled DDNS job: ", j);
-}
+}, delay);
